@@ -1610,6 +1610,15 @@ async function refreshAdmin() {
   } catch(e) {}
 }
 
+function fmtTime(t) {
+  if (!t) return '—';
+  if (typeof t === 'string' && t.includes('T')) {
+    const d = new Date(t);
+    return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+  }
+  return t;
+}
+
 function renderAdmin() {
   const total    = A.bookings.length;
   const arztN    = A.bookings.filter(b => b.type === 'arzt').length;
@@ -1638,7 +1647,7 @@ function renderAdmin() {
   const entries = (A.day === 'NOTFALL'
     ? A.bookings.filter(b => b.type === 'notfall')
     : A.bookings.filter(b => b.dayId === A.day && b.type !== 'notfall')
-  ).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+  ).sort((a, b) => fmtTime(a.time).localeCompare(fmtTime(b.time)));
 
   if (!entries.length) {
     body.innerHTML = '<p class="admin-empty">Keine Buchungen</p>';
@@ -1649,7 +1658,7 @@ function renderAdmin() {
     const cls   = b.type === 'notfall' ? 'notfall' : b.type === 'arzt' ? 'arzt' : 'physio';
     const badge = b.type === 'notfall' ? 'NOTFALL' : b.type === 'arzt' ? 'ARZT' : 'PHYSIO';
     return `<div class="admin-entry">
-      <div class="admin-time">${b.type === 'notfall' ? '⚡' : (b.time || '—')}</div>
+      <div class="admin-time">${b.type === 'notfall' ? '⚡' : fmtTime(b.time)}</div>
       <div class="admin-info">
         <div class="admin-name">${b.name || '—'}</div>
         <div class="admin-phone">${b.phone || ''}</div>
