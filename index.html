@@ -1138,11 +1138,10 @@ async function cancelBooking() {
 async function postBackend(data) {
   if (CFG.BACKEND === 'APPS_SCRIPT_URL_HIER') return;
   try {
-    await fetch(CFG.BACKEND, {
-      method: 'POST',
+    const params = new URLSearchParams(data).toString();
+    await fetch(`${CFG.BACKEND}?${params}`, {
+      method: 'GET',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
     });
   } catch(e) { console.warn('Backend error:', e); }
 }
