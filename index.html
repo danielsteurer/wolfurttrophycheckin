@@ -27,6 +27,7 @@
   --grid:    rgba(154,216,158,0.18);
   --muted:   rgba(255,255,255,0.55);
   --dim:     rgba(255,255,255,0.15);
+  --warn:    #D95F43;
   --sans:    'Geist', system-ui, -apple-system, sans-serif;
   --mono:    'Geist Mono', ui-monospace, monospace;
 }
@@ -40,7 +41,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Dashed grid overlay (Brand Manual) */
 body::before {
   content: '';
   position: fixed;
@@ -67,34 +67,68 @@ body::before {
 .screen.active { display: flex; }
 
 .hd {
-  padding: 20px 24px 16px;
+  padding: 16px 20px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px dashed var(--grid);
   flex-shrink: 0;
+  gap: 12px;
 }
 
-.logo { height: 36px; width: auto; display: block; }
+/* ── Logos ────────────────────────────────────────── */
+.hd-logos {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Use logo-dark.png with multiply to blend out white background.
+   Replace with a transparent PNG for a perfect result. */
+.logo-wk {
+  height: 26px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+  mix-blend-mode: multiply;
+}
+
+.logo-div {
+  width: 1px;
+  height: 20px;
+  background: var(--dim);
+  flex-shrink: 0;
+}
+
+.logo-wt {
+  height: 30px;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
+}
+
 .logo-fallback {
   font-family: var(--sans);
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: -0.04em;
   color: var(--white);
+  white-space: nowrap;
 }
 .logo-fallback span { color: var(--mint); }
 
 .main {
   flex: 1;
-  padding: 28px 24px 24px;
+  padding: 24px 20px 20px;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ft {
-  padding: 14px 24px;
+  padding: 12px 20px;
   border-top: 1px dashed var(--grid);
   display: flex;
   justify-content: space-between;
@@ -124,7 +158,7 @@ body::before {
 
 .h1 {
   font-weight: 600;
-  font-size: clamp(38px, 10vw, 56px);
+  font-size: clamp(36px, 10vw, 54px);
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.9;
@@ -135,7 +169,7 @@ body::before {
 
 .h2 {
   font-weight: 600;
-  font-size: clamp(28px, 7vw, 40px);
+  font-size: clamp(26px, 7vw, 38px);
   text-transform: uppercase;
   letter-spacing: -0.04em;
   line-height: 0.92;
@@ -158,6 +192,7 @@ body::before {
   display: flex;
   border: 1px solid var(--dim);
   overflow: hidden;
+  flex-shrink: 0;
 }
 .lang-btn {
   background: transparent;
@@ -167,9 +202,10 @@ body::before {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 7px 11px;
+  padding: 8px 12px;
   cursor: pointer;
   transition: all 0.12s;
+  min-height: 36px;
 }
 .lang-btn.on { background: var(--mint); color: var(--green); }
 
@@ -186,7 +222,8 @@ body::before {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0;
+  padding: 8px 0;
+  min-height: 36px;
 }
 .back:hover { color: var(--white); }
 
@@ -194,18 +231,19 @@ body::before {
 .btn {
   display: block;
   width: 100%;
-  padding: 17px 20px;
+  padding: 18px 20px;
   font-family: var(--sans);
   font-weight: 600;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: -0.01em;
   text-transform: uppercase;
   cursor: pointer;
   border: none;
   transition: opacity 0.12s;
   text-align: left;
+  min-height: 56px;
 }
-.btn:active { opacity: 0.8; }
+.btn:active { opacity: 0.75; }
 
 .btn-p { background: var(--mint); color: var(--green); }
 .btn-p::after { content: ' →'; }
@@ -214,9 +252,15 @@ body::before {
   background: transparent;
   color: var(--white);
   border: 1px solid var(--dim);
-  margin-top: 8px;
+  margin-top: 10px;
 }
 .btn-s:hover { border-color: rgba(255,255,255,0.4); }
+
+.btn-notfall {
+  background: var(--warn);
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
 
 .btn-ghost {
   background: none;
@@ -227,7 +271,7 @@ body::before {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
-  padding: 10px 0;
+  padding: 12px 0;
   width: auto;
   display: inline-block;
 }
@@ -241,12 +285,14 @@ body::before {
 }
 
 .type-card {
-  padding: 24px 18px 20px;
+  padding: 22px 16px 18px;
   border: 1px solid var(--dim);
   cursor: pointer;
   background: rgba(255,255,255,0.03);
   transition: all 0.12s;
   user-select: none;
+  -webkit-user-select: none;
+  min-height: 110px;
 }
 .type-card:hover, .type-card:active {
   border-color: var(--mint);
@@ -273,13 +319,32 @@ body::before {
 
 .tc-sub {
   font-size: 11px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.4);
   margin-top: 10px;
   line-height: 1.5;
 }
 
+/* ── Notfall section ──────────────────────────────── */
+.notfall-wrap {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px dashed var(--grid);
+}
+.notfall-hint {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-top: 8px;
+}
+.notfall-val {
+  color: var(--warn) !important;
+  font-weight: 700 !important;
+}
+
 /* ── Slot grid ────────────────────────────────────── */
-.day-sec { margin-bottom: 20px; }
+.day-sec { margin-bottom: 22px; }
 
 .day-label {
   font-family: var(--mono);
@@ -295,17 +360,23 @@ body::before {
 .slots-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 6px;
 }
 
 .slot {
-  padding: 11px 6px;
+  padding: 14px 6px;
   border: 1px solid var(--dim);
   background: rgba(255,255,255,0.03);
   cursor: pointer;
   text-align: center;
   transition: all 0.1s;
   user-select: none;
+  -webkit-user-select: none;
+  min-height: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 .slot:hover:not(.slot-full) {
   border-color: var(--mint);
@@ -315,16 +386,15 @@ body::before {
   background: var(--mint);
   border-color: var(--mint);
 }
-.slot.picked .s-time { color: var(--green); }
-.slot.picked .s-avail { color: rgba(61,103,94,0.75); }
+.slot.picked .s-time  { color: var(--green); }
+.slot.picked .s-avail { color: rgba(61,103,94,0.7); }
 
-.slot-full { opacity: 0.38; }
-.slot-full:hover { border-color: var(--dim); background: rgba(255,255,255,0.03); cursor: pointer; }
+.slot-full { opacity: 0.35; cursor: pointer; }
 
 .s-time {
   display: block;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: -0.02em;
   color: var(--white);
 }
@@ -334,9 +404,9 @@ body::before {
   font-size: 9px;
   letter-spacing: 0.06em;
   color: var(--mint);
-  margin-top: 3px;
+  margin-top: 4px;
 }
-.slot-full .s-avail { color: rgba(255,255,255,0.35); }
+.slot-full .s-avail { color: rgba(255,255,255,0.3); }
 
 /* ── Form ─────────────────────────────────────────── */
 .field { margin-bottom: 14px; }
@@ -348,12 +418,12 @@ body::before {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--mint);
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .field-input {
   width: 100%;
-  padding: 13px 15px;
+  padding: 15px 16px;
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--dim);
   color: var(--white);
@@ -363,22 +433,23 @@ body::before {
   outline: none;
   -webkit-appearance: none;
   transition: border-color 0.12s;
+  min-height: 52px;
 }
 .field-input:focus { border-color: var(--mint); }
-.field-input::placeholder { color: rgba(255,255,255,0.25); }
+.field-input::placeholder { color: rgba(255,255,255,0.22); }
 
 /* ── Summary card ─────────────────────────────────── */
 .sum-card {
   background: rgba(255,255,255,0.05);
   border: 1px solid var(--dim);
-  padding: 14px 18px;
+  padding: 14px 16px;
   margin-bottom: 18px;
 }
 .sum-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 5px 0;
+  padding: 6px 0;
   border-bottom: 1px dashed var(--grid);
 }
 .sum-row:last-child { border-bottom: none; }
@@ -387,13 +458,15 @@ body::before {
   font-size: 9px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.38);
 }
 .sum-v {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--white);
+  text-align: right;
+  margin-left: 12px;
 }
 
 /* ── Code display ─────────────────────────────────── */
@@ -434,14 +507,14 @@ body::before {
 
 /* ── Alert ────────────────────────────────────────── */
 .alert {
-  padding: 12px 15px;
+  padding: 13px 15px;
   border: 1px solid var(--dim);
   margin-bottom: 14px;
   font-size: 13px;
   line-height: 1.5;
   display: none;
 }
-.alert-warn { border-color: rgba(255,180,80,0.5); color: rgba(255,210,130,1); background: rgba(255,180,80,0.06); }
+.alert-warn { border-color: rgba(217,95,67,0.5); color: rgba(255,180,150,1); background: rgba(217,95,67,0.06); }
 .alert-ok   { border-color: rgba(154,216,158,0.5); color: var(--mint); background: rgba(154,216,158,0.06); }
 
 /* ── Loading ──────────────────────────────────────── */
@@ -449,7 +522,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 0;
+  padding: 24px 0;
   color: var(--muted);
   font-family: var(--mono);
   font-size: 10px;
@@ -491,9 +564,14 @@ body::before {
 <!-- ════════════════════════════════════════════════ -->
 <div class="screen active" id="s-home">
   <div class="hd">
-    <img class="logo" src="./logo-white.png" alt="werkeins"
-         onerror="this.style.display='none';document.getElementById('logo-fb').style.display='block'">
-    <div class="logo-fallback" id="logo-fb" style="display:none">werk<span>eins</span></div>
+    <div class="hd-logos">
+      <img class="logo-wk" src="./logo-dark.png" alt="werkeins"
+           onerror="this.style.display='none';document.getElementById('logo-fb').style.display='block'">
+      <div class="logo-fallback" id="logo-fb" style="display:none">werk<span>eins</span></div>
+      <div class="logo-div"></div>
+      <img class="logo-wt" src="./WTLogo.png" alt="Wolfurt Trophy"
+           onerror="this.style.display='none'">
+    </div>
     <div class="lang">
       <button class="lang-btn on" onclick="setLang('de')">DE</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
@@ -523,7 +601,35 @@ body::before {
   </div>
   <div class="ft">
     <span>werkeins.at</span>
-    <span>Sportmedizin | Physiotherapie</span>
+    <span>7.–9. August 2026</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- PHYSIO SELECTION                                -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-physio">
+  <div class="hd">
+    <button class="back" onclick="go('s-home')">← <span id="back5">Zurück</span></button>
+    <div class="lang">
+      <button class="lang-btn on" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="physio-eyebrow">Physiotherapie</div>
+    <h2 class="h2" id="physio-title">THERAPEUT<br>WÄHLEN</h2>
+    <hr class="hr">
+    <div class="type-grid">
+      <div class="type-card" onclick="pickPhysio('tobi')">
+        <div class="tc-label" id="tc-tobi-label">Physiotherapie</div>
+        <div class="tc-title">TOBI</div>
+      </div>
+      <div class="type-card" onclick="pickPhysio('lea')">
+        <div class="tc-label" id="tc-lea-label">Physiotherapie</div>
+        <div class="tc-title">LEA</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -532,7 +638,7 @@ body::before {
 <!-- ════════════════════════════════════════════════ -->
 <div class="screen" id="s-slots">
   <div class="hd">
-    <button class="back" onclick="go('s-home')">← <span id="back1">Zurück</span></button>
+    <button class="back" onclick="goBackFromSlots()">← <span id="back1">Zurück</span></button>
     <div class="lang">
       <button class="lang-btn on" onclick="setLang('de')">DE</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
@@ -581,8 +687,13 @@ body::before {
 <!-- ════════════════════════════════════════════════ -->
 <div class="screen" id="s-confirm">
   <div class="hd">
-    <img class="logo" src="./logo-white.png" alt="werkeins"
-         onerror="this.style.display='none'">
+    <div class="hd-logos">
+      <img class="logo-wk" src="./logo-dark.png" alt="werkeins"
+           onerror="this.style.display='none'">
+      <div class="logo-div"></div>
+      <img class="logo-wt" src="./WTLogo.png" alt="Wolfurt Trophy"
+           onerror="this.style.display='none'">
+    </div>
   </div>
   <div class="main">
     <div class="eyebrow"><span class="dot-live"></span><span id="confirm-eyebrow">Buchung bestätigt</span></div>
@@ -602,7 +713,7 @@ body::before {
   </div>
   <div class="ft">
     <span>werkeins.at</span>
-    <span>Sportmedizin | Physiotherapie</span>
+    <span>7.–9. August 2026</span>
   </div>
 </div>
 
@@ -667,24 +778,47 @@ body::before {
 
 <script>
 // ════════════════════════════════════════════════════
-// CONFIG — hier anpassen vor dem Deployment
+// CONFIG
 // ════════════════════════════════════════════════════
 const CFG = {
-  // Nach Deployment des Google Apps Script diese URL eintragen:
   BACKEND: 'https://script.google.com/macros/s/AKfycbx6F7juppoBxQVtAQgGAyuryD1vonwNsH-0EHrtyEH4ebXhbBjtm4SwulqUixagGqOe/exec',
 
-  EVENT: 'Wolfurt Trophy',
+  EVENT: 'Wolfurt Trophy 2026',
 
-  // Turniertage — genaue Daten eintragen sobald bekannt
+  // Freitag–Sonntag, 7.–9. August 2026
+  // Slots: 20 Min um :00 und :30, danach 10 Min Pause
   DAYS: [
-    { id:'FR', de:'Freitag',   en:'Friday',   start:'12:00', end:'19:00' },
-    { id:'SA', de:'Samstag',   en:'Saturday', start:'10:00', end:'18:00' },
-    { id:'SO', de:'Sonntag',   en:'Sunday',   start:'10:00', end:'15:00' },
+    {
+      id: 'FR',
+      de: 'FR · 7. August',
+      en: 'FRI · 7 August',
+      sessions: [
+        { start: '13:00', end: '18:00' },
+      ],
+    },
+    {
+      id: 'SA',
+      de: 'SA · 8. August',
+      en: 'SAT · 8 August',
+      sessions: [
+        { start: '09:00', end: '12:00' },
+        { start: '13:00', end: '18:00' },
+      ],
+    },
+    {
+      id: 'SO',
+      de: 'SO · 9. August',
+      en: 'SUN · 9 August',
+      sessions: [
+        { start: '09:00', end: '11:00' },
+        { start: '13:00', end: '15:00' },
+      ],
+    },
   ],
 
-  SLOT_MIN:    20,  // Minuten pro Slot
-  BREAK_EVERY: 2,   // Pause nach N Slots
-  BREAK_MIN:   10,  // Minuten Pause
+  SLOT_MIN:    20,  // 20 Min pro Slot
+  BREAK_EVERY: 1,   // Pause nach jedem Slot
+  BREAK_MIN:   10,  // 10 Min Pause → Slots um :00 und :30
 
   CAP: { arzt: 1, physio: 2 },
 };
@@ -694,102 +828,122 @@ const CFG = {
 // ════════════════════════════════════════════════════
 const TX = {
   de: {
-    'home.eyebrow':    'Wolfurt Trophy · Sportmedizin',
-    'home.sub':        'Wähle, ob du einen Termin beim Arzt oder bei der Physiotherapie buchen möchtest.',
-    'home.cancel':     'Buchung stornieren',
-    'tc.arzt.label':   'Sportmedizin',
-    'tc.arzt.title':   'ARZT',
-    'tc.arzt.sub':     'Verletzung · Beurteilung · Akutversorgung',
-    'tc.physio.label': 'Physiotherapie',
-    'tc.physio.title': 'PHYSIO',
-    'tc.physio.sub':   'Therapie · Taping · Mobilisation',
-    'back':            'Zurück',
-    'slots.title':     'SLOT WÄHLEN',
-    'form.eyebrow':    'Deine Angaben',
-    'form.title':      'ANMELDEN',
-    'lbl.name':        'Name',
-    'lbl.phone':       'Handynummer',
-    'ph.name':         'Vollständiger Name',
-    'ph.phone':        '+43 660 123 456',
-    'form.submit':     'JETZT BUCHEN',
-    'confirm.eyebrow': 'Buchung bestätigt',
-    'confirm.title':   'ALLES\nBEREIT.',
-    'code.label':      'Dein Buchungscode',
-    'confirm.hint':    'Screenshot machen oder Code notieren — du brauchst ihn für eine Stornierung.',
-    'confirm.new':     'NEUE BUCHUNG',
-    'wl.badge':        'Warteliste',
-    'wl.title':        'ALLE SLOTS\nBELEGT.',
-    'wl.text':         'Komm einfach vorbei — wir finden gemeinsam eine Lösung. Das werkeins-Team ist für dich da.',
-    'wl.hint':         'Warteliste eintragen? Wir melden uns per SMS wenn ein Platz frei wird.',
-    'wl.submit':       'AUF WARTELISTE',
-    'wl.skip':         'EINFACH VORBEIKOMMEN',
-    'cancel.eyebrow':  'Stornierung',
-    'cancel.title':    'BUCHUNG\nSTORNIEREN',
-    'cancel.code':     'Buchungscode',
-    'cancel.submit':   'STORNIEREN',
-    'cancel.back':     'ZURÜCK',
-    'cancel.ok':       'Buchung erfolgreich storniert.',
-    'loading':         'Laden...',
-    'slot.full':       'voll',
-    'slot.free1':      'Platz frei',
-    'slot.freeN':      'Plätze frei',
-    'err.name':        'Bitte gib deinen Namen ein.',
-    'err.phone':       'Bitte gib deine Handynummer ein.',
-    'err.code':        'Code nicht gefunden. Bitte Code prüfen.',
-    'lbl.type':        'Art',
-    'lbl.day':         'Tag',
-    'lbl.time':        'Zeit',
-    'type.arzt':       'Arzt',
-    'type.physio':     'Physio',
+    'home.eyebrow':     'Wolfurt Trophy · Sportmedizin',
+    'home.sub':         'Wähle, ob du einen Termin beim Arzt oder bei der Physiotherapie buchen möchtest.',
+    'home.cancel':      'Buchung stornieren',
+    'tc.arzt.label':    'Sportmedizin',
+    'tc.arzt.title':    'ARZT',
+    'tc.arzt.sub':      'Verletzung · Beurteilung · Akutversorgung',
+    'tc.physio.label':  'Physiotherapie',
+    'tc.physio.title':  'PHYSIO',
+    'tc.physio.sub':    'Therapie · Taping · Mobilisation',
+    'physio.eyebrow':   'Physiotherapie',
+    'physio.title':     'THERAPEUT\nWÄHLEN',
+    'tc.tobi.label':    'Physiotherapie',
+    'tc.lea.label':     'Physiotherapie',
+    'back':             'Zurück',
+    'slots.title':      'SLOT WÄHLEN',
+    'notfall.btn':      'NOTFALL',
+    'notfall.hint':     'Sofortiger Eintrag — kein Termin nötig',
+    'notfall.label':    'Notfall',
+    'notfall.time':     'Sofort',
+    'notfall.status':   'Status',
+    'form.eyebrow':     'Deine Angaben',
+    'form.title':       'ANMELDEN',
+    'lbl.name':         'Name',
+    'lbl.phone':        'Handynummer',
+    'lbl.physio':       'Therapeut',
+    'ph.name':          'Vollständiger Name',
+    'ph.phone':         '+43 660 123 456',
+    'form.submit':      'JETZT BUCHEN',
+    'confirm.eyebrow':  'Buchung bestätigt',
+    'confirm.title':    'ALLES\nBEREIT.',
+    'code.label':       'Dein Buchungscode',
+    'confirm.hint':     'Screenshot machen oder Code notieren — du brauchst ihn für eine Stornierung.',
+    'confirm.new':      'NEUE BUCHUNG',
+    'wl.badge':         'Warteliste',
+    'wl.title':         'ALLE SLOTS\nBELEGT.',
+    'wl.text':          'Komm einfach vorbei — wir finden gemeinsam eine Lösung. Das werkeins-Team ist für dich da.',
+    'wl.hint':          'Warteliste eintragen? Wir melden uns per SMS wenn ein Platz frei wird.',
+    'wl.submit':        'AUF WARTELISTE',
+    'wl.skip':          'EINFACH VORBEIKOMMEN',
+    'cancel.eyebrow':   'Stornierung',
+    'cancel.title':     'BUCHUNG\nSTORNIEREN',
+    'cancel.code':      'Buchungscode',
+    'cancel.submit':    'STORNIEREN',
+    'cancel.back':      'ZURÜCK',
+    'cancel.ok':        'Buchung erfolgreich storniert.',
+    'loading':          'Laden...',
+    'slot.full':        'voll',
+    'slot.free1':       'Platz frei',
+    'slot.freeN':       'Plätze frei',
+    'err.name':         'Bitte gib deinen Namen ein.',
+    'err.phone':        'Bitte gib deine Handynummer ein.',
+    'err.code':         'Code nicht gefunden. Bitte Code prüfen.',
+    'lbl.type':         'Art',
+    'lbl.day':          'Tag',
+    'lbl.time':         'Zeit',
+    'type.arzt':        'Arzt',
+    'type.physio':      'Physio',
   },
   en: {
-    'home.eyebrow':    'Wolfurt Trophy · Sports Medicine',
-    'home.sub':        'Choose whether you want to book an appointment with the doctor or physiotherapy.',
-    'home.cancel':     'Cancel booking',
-    'tc.arzt.label':   'Sports Medicine',
-    'tc.arzt.title':   'DOCTOR',
-    'tc.arzt.sub':     'Injury · Assessment · Acute care',
-    'tc.physio.label': 'Physiotherapy',
-    'tc.physio.title': 'PHYSIO',
-    'tc.physio.sub':   'Therapy · Taping · Mobilisation',
-    'back':            'Back',
-    'slots.title':     'CHOOSE SLOT',
-    'form.eyebrow':    'Your Details',
-    'form.title':      'REGISTER',
-    'lbl.name':        'Name',
-    'lbl.phone':       'Phone number',
-    'ph.name':         'Full name',
-    'ph.phone':        '+43 660 123 456',
-    'form.submit':     'BOOK NOW',
-    'confirm.eyebrow': 'Booking confirmed',
-    'confirm.title':   'ALL\nSET.',
-    'code.label':      'Your booking code',
-    'confirm.hint':    'Take a screenshot or note this code — you need it to cancel.',
-    'confirm.new':     'NEW BOOKING',
-    'wl.badge':        'Waitlist',
-    'wl.title':        'ALL SLOTS\nTAKEN.',
-    'wl.text':         "Just come by — we'll find a solution. The werkeins team is here for you.",
-    'wl.hint':         'Join the waitlist? We\'ll text you when a spot opens up.',
-    'wl.submit':       'JOIN WAITLIST',
-    'wl.skip':         'JUST COME BY',
-    'cancel.eyebrow':  'Cancellation',
-    'cancel.title':    'CANCEL\nBOOKING',
-    'cancel.code':     'Booking code',
-    'cancel.submit':   'CANCEL BOOKING',
-    'cancel.back':     'BACK',
-    'cancel.ok':       'Booking successfully cancelled.',
-    'loading':         'Loading...',
-    'slot.full':       'full',
-    'slot.free1':      'spot left',
-    'slot.freeN':      'spots left',
-    'err.name':        'Please enter your name.',
-    'err.phone':       'Please enter your phone number.',
-    'err.code':        'Code not found. Please check the code.',
-    'lbl.type':        'Type',
-    'lbl.day':         'Day',
-    'lbl.time':        'Time',
-    'type.arzt':       'Doctor',
-    'type.physio':     'Physio',
+    'home.eyebrow':     'Wolfurt Trophy · Sports Medicine',
+    'home.sub':         'Choose whether you want to book an appointment with the doctor or physiotherapy.',
+    'home.cancel':      'Cancel booking',
+    'tc.arzt.label':    'Sports Medicine',
+    'tc.arzt.title':    'DOCTOR',
+    'tc.arzt.sub':      'Injury · Assessment · Acute care',
+    'tc.physio.label':  'Physiotherapy',
+    'tc.physio.title':  'PHYSIO',
+    'tc.physio.sub':    'Therapy · Taping · Mobilisation',
+    'physio.eyebrow':   'Physiotherapy',
+    'physio.title':     'CHOOSE\nTHERAPIST',
+    'tc.tobi.label':    'Physiotherapy',
+    'tc.lea.label':     'Physiotherapy',
+    'back':             'Back',
+    'slots.title':      'CHOOSE SLOT',
+    'notfall.btn':      'EMERGENCY',
+    'notfall.hint':     'Immediate entry — no appointment needed',
+    'notfall.label':    'Emergency',
+    'notfall.time':     'Immediate',
+    'notfall.status':   'Status',
+    'form.eyebrow':     'Your Details',
+    'form.title':       'REGISTER',
+    'lbl.name':         'Name',
+    'lbl.phone':        'Phone number',
+    'lbl.physio':       'Therapist',
+    'ph.name':          'Full name',
+    'ph.phone':         '+43 660 123 456',
+    'form.submit':      'BOOK NOW',
+    'confirm.eyebrow':  'Booking confirmed',
+    'confirm.title':    'ALL\nSET.',
+    'code.label':       'Your booking code',
+    'confirm.hint':     'Take a screenshot or note this code — you need it to cancel.',
+    'confirm.new':      'NEW BOOKING',
+    'wl.badge':         'Waitlist',
+    'wl.title':         'ALL SLOTS\nTAKEN.',
+    'wl.text':          "Just come by — we'll find a solution. The werkeins team is here for you.",
+    'wl.hint':          "Join the waitlist? We'll text you when a spot opens up.",
+    'wl.submit':        'JOIN WAITLIST',
+    'wl.skip':          'JUST COME BY',
+    'cancel.eyebrow':   'Cancellation',
+    'cancel.title':     'CANCEL\nBOOKING',
+    'cancel.code':      'Booking code',
+    'cancel.submit':    'CANCEL BOOKING',
+    'cancel.back':      'BACK',
+    'cancel.ok':        'Booking successfully cancelled.',
+    'loading':          'Loading...',
+    'slot.full':        'full',
+    'slot.free1':       'spot left',
+    'slot.freeN':       'spots left',
+    'err.name':         'Please enter your name.',
+    'err.phone':        'Please enter your phone number.',
+    'err.code':         'Code not found. Please check the code.',
+    'lbl.type':         'Type',
+    'lbl.day':          'Day',
+    'lbl.time':         'Time',
+    'type.arzt':        'Doctor',
+    'type.physio':      'Physio',
   }
 };
 
@@ -797,10 +951,11 @@ const TX = {
 // STATE
 // ════════════════════════════════════════════════════
 const S = {
-  lang:    'de',
-  type:    null,
-  slot:    null,   // { id, time, dayLabel }
-  slots:   null,   // availability map from backend
+  lang:   'de',
+  type:   null,
+  physio: null,   // 'tobi' | 'lea' | null
+  slot:   null,   // { id, time, dayLabel } — id='NOTFALL' for emergencies
+  slots:  null,   // availability map from backend
 };
 
 // ════════════════════════════════════════════════════
@@ -816,16 +971,21 @@ function genCode() {
 function genSlots(day) {
   const slots = [];
   const toMin = s => { const [h,m] = s.split(':').map(Number); return h*60+m; };
-  let cur = toMin(day.start);
-  const end = toMin(day.end);
-  let n = 0;
-  while (cur + CFG.SLOT_MIN <= end) {
-    const hh = String(cur/60|0).padStart(2,'0');
-    const mm = String(cur%60).padStart(2,'0');
-    slots.push({ dayId: day.id, time: `${hh}:${mm}` });
-    cur += CFG.SLOT_MIN;
-    if (++n % CFG.BREAK_EVERY === 0 && cur + CFG.SLOT_MIN <= end) cur += CFG.BREAK_MIN;
-  }
+  const sessions = day.sessions || [{ start: day.start, end: day.end }];
+
+  sessions.forEach(session => {
+    let cur = toMin(session.start);
+    const end = toMin(session.end);
+    let n = 0;
+    while (cur + CFG.SLOT_MIN <= end) {
+      const hh = String(cur/60|0).padStart(2,'0');
+      const mm = String(cur%60).padStart(2,'0');
+      slots.push({ dayId: day.id, time: `${hh}:${mm}` });
+      cur += CFG.SLOT_MIN;
+      if (++n % CFG.BREAK_EVERY === 0 && cur + CFG.SLOT_MIN <= end) cur += CFG.BREAK_MIN;
+    }
+  });
+
   return slots;
 }
 
@@ -833,6 +993,7 @@ function sumHTML({ type, dayLabel, time, name, phone }) {
   const typeLabel = type === 'arzt' ? t('type.arzt') : t('type.physio');
   const rows = [
     [t('lbl.type'), typeLabel],
+    ...(S.physio ? [[t('lbl.physio'), cap(S.physio)]] : []),
     [t('lbl.day'),  dayLabel || ''],
     [t('lbl.time'), time     || ''],
     ...(name  ? [[t('lbl.name'),  name]]  : []),
@@ -843,6 +1004,22 @@ function sumHTML({ type, dayLabel, time, name, phone }) {
   ).join('');
 }
 
+function notfallSumHTML({ name, phone } = {}) {
+  const rows = [
+    [t('lbl.type'),       t('type.arzt')],
+    [t('notfall.status'), `<span class="notfall-val">${t('notfall.label').toUpperCase()}</span>`],
+    ...(name  ? [[t('lbl.name'),  name]]  : []),
+    ...(phone ? [[t('lbl.phone'), phone]] : []),
+  ];
+  return rows.map(([k,v]) =>
+    `<div class="sum-row"><span class="sum-k">${k}</span><span class="sum-v">${v}</span></div>`
+  ).join('');
+}
+
+function cap(str) {
+  return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+}
+
 // ════════════════════════════════════════════════════
 // NAVIGATION
 // ════════════════════════════════════════════════════
@@ -850,6 +1027,10 @@ function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
+}
+
+function goBackFromSlots() {
+  go(S.type === 'physio' ? 's-physio' : 's-home');
 }
 
 // ════════════════════════════════════════════════════
@@ -863,45 +1044,46 @@ function setLang(lang) {
     b.classList.toggle('on', b.textContent === lang.toUpperCase())
   );
 
-  // Update all translatable elements
   const set = (id, key, prop='textContent') => {
     const el = document.getElementById(id);
     if (el) el[prop] = t(key);
   };
 
-  set('home-eyebrow',   'home.eyebrow');
-  set('home-sub',       'home.sub');
-  set('home-cancel-btn','home.cancel');
-  set('tc-arzt-label',  'tc.arzt.label');
-  set('tc-arzt-title',  'tc.arzt.title');
-  set('tc-arzt-sub',    'tc.arzt.sub');
-  set('tc-physio-label','tc.physio.label');
-  set('tc-physio-title','tc.physio.title');
-  set('tc-physio-sub',  'tc.physio.sub');
-  ['back1','back2','back3','back4'].forEach(id => set(id, 'back'));
-  set('slots-title',    'slots.title');
-  set('form-eyebrow',   'form.eyebrow');
-  set('form-title',     'form.title');
-  set('lbl-name',       'lbl.name');
-  set('lbl-phone',      'lbl.phone');
-  set('form-submit',    'form.submit');
-  set('confirm-eyebrow','confirm.eyebrow');
-  set('code-label',     'code.label');
-  set('confirm-hint',   'confirm.hint');
-  set('confirm-new',    'confirm.new');
-  set('wl-badge',       'wl.badge');
-  set('wl-text',        'wl.text');
-  set('wl-hint',        'wl.hint');
-  set('wl-submit',      'wl.submit');
-  set('wl-skip',        'wl.skip');
-  set('wl-lbl-name',    'lbl.name');
-  set('wl-lbl-phone',   'lbl.phone');
-  set('cancel-eyebrow', 'cancel.eyebrow');
-  set('cancel-title',   'cancel.title');
+  set('home-eyebrow',    'home.eyebrow');
+  set('home-sub',        'home.sub');
+  set('home-cancel-btn', 'home.cancel');
+  set('tc-arzt-label',   'tc.arzt.label');
+  set('tc-arzt-title',   'tc.arzt.title');
+  set('tc-arzt-sub',     'tc.arzt.sub');
+  set('tc-physio-label', 'tc.physio.label');
+  set('tc-physio-title', 'tc.physio.title');
+  set('tc-physio-sub',   'tc.physio.sub');
+  set('physio-eyebrow',  'physio.eyebrow');
+  set('tc-tobi-label',   'tc.tobi.label');
+  set('tc-lea-label',    'tc.lea.label');
+  ['back1','back2','back3','back4','back5'].forEach(id => set(id, 'back'));
+  set('slots-title',     'slots.title');
+  set('form-eyebrow',    'form.eyebrow');
+  set('form-title',      'form.title');
+  set('lbl-name',        'lbl.name');
+  set('lbl-phone',       'lbl.phone');
+  set('form-submit',     'form.submit');
+  set('confirm-eyebrow', 'confirm.eyebrow');
+  set('code-label',      'code.label');
+  set('confirm-hint',    'confirm.hint');
+  set('confirm-new',     'confirm.new');
+  set('wl-badge',        'wl.badge');
+  set('wl-text',         'wl.text');
+  set('wl-hint',         'wl.hint');
+  set('wl-submit',       'wl.submit');
+  set('wl-skip',         'wl.skip');
+  set('wl-lbl-name',     'lbl.name');
+  set('wl-lbl-phone',    'lbl.phone');
+  set('cancel-eyebrow',  'cancel.eyebrow');
   set('cancel-code-label','cancel.code');
-  set('cancel-submit',  'cancel.submit');
-  set('cancel-back',    'cancel.back');
-  set('loading-txt',    'loading');
+  set('cancel-submit',   'cancel.submit');
+  set('cancel-back',     'cancel.back');
+  set('loading-txt',     'loading');
 
   const inp = document.getElementById('inp-name');
   if (inp) inp.placeholder = t('ph.name');
@@ -909,6 +1091,8 @@ function setLang(lang) {
   if (inph) inph.placeholder = t('ph.phone');
 
   // h2 titles with line breaks
+  const pt = document.getElementById('physio-title');
+  if (pt) pt.innerHTML = t('physio.title').replace('\n','<br>');
   const ct = document.getElementById('confirm-title');
   if (ct) ct.innerHTML = t('confirm.title').replace('\n','<br>');
   const wt = document.getElementById('wl-title');
@@ -916,7 +1100,6 @@ function setLang(lang) {
   const cat = document.getElementById('cancel-title');
   if (cat) cat.innerHTML = t('cancel.title').replace('\n','<br>');
 
-  // Re-render slots if loaded
   if (S.slots && S.type) renderSlots();
 }
 
@@ -924,12 +1107,34 @@ function setLang(lang) {
 // TYPE SELECTION
 // ════════════════════════════════════════════════════
 function pickType(type) {
-  S.type = type;
-  S.slot = null;
-  document.getElementById('slots-eyebrow').textContent =
-    type === 'arzt' ? t('tc.arzt.title') : t('tc.physio.title');
+  S.type  = type;
+  S.slot  = null;
+  S.physio = null;
+
+  if (type === 'physio') {
+    go('s-physio');
+    return;
+  }
+
+  document.getElementById('slots-eyebrow').textContent = t('tc.arzt.title');
   go('s-slots');
   loadSlots(type);
+}
+
+function pickPhysio(physio) {
+  S.physio = physio;
+  document.getElementById('slots-eyebrow').textContent = `Physio — ${cap(physio)}`;
+  go('s-slots');
+  loadSlots('physio');
+}
+
+// ════════════════════════════════════════════════════
+// NOTFALL
+// ════════════════════════════════════════════════════
+function pickNotfall() {
+  S.slot = { id: 'NOTFALL', dayId: null, time: null, dayLabel: null };
+  document.getElementById('form-sum').innerHTML = notfallSumHTML();
+  go('s-form');
 }
 
 // ════════════════════════════════════════════════════
@@ -945,7 +1150,6 @@ async function loadSlots(type) {
       const d = await r.json();
       S.slots = d.slots;
     } else {
-      // Demo mode: all slots available
       S.slots = {};
       CFG.DAYS.forEach(day => {
         genSlots(day).forEach(sl => {
@@ -956,7 +1160,6 @@ async function loadSlots(type) {
       });
     }
   } catch(e) {
-    // Fallback demo
     S.slots = {};
     CFG.DAYS.forEach(day => {
       genSlots(day).forEach(sl => {
@@ -974,18 +1177,26 @@ function renderSlots() {
   const body = document.getElementById('slots-body');
   let html = '';
 
+  // Notfall button — only for Arzt
+  if (S.type === 'arzt') {
+    html += `<div class="notfall-wrap">
+      <button class="btn btn-notfall" onclick="pickNotfall()">${t('notfall.btn')}</button>
+      <p class="notfall-hint">${t('notfall.hint')}</p>
+    </div>`;
+  }
+
   CFG.DAYS.forEach(day => {
     const dayLabel = S.lang === 'de' ? day.de : day.en;
     html += `<div class="day-sec"><div class="day-label">${dayLabel}</div><div class="slots-grid">`;
 
     genSlots(day).forEach(sl => {
-      const key  = `${sl.dayId}-${sl.time}`;
-      const info = S.slots?.[key] ?? { available: CFG.CAP[S.type], capacity: CFG.CAP[S.type] };
+      const key   = `${sl.dayId}-${sl.time}`;
+      const info  = S.slots?.[key] ?? { available: CFG.CAP[S.type], capacity: CFG.CAP[S.type] };
       const avail = info.available;
       const full  = avail <= 0;
       const picked = S.slot && S.slot.id === key;
 
-      let availTxt = full ? t('slot.full') :
+      const availTxt = full ? t('slot.full') :
         avail === 1 ? `1 ${t('slot.free1')}` : `${avail} ${t('slot.freeN')}`;
 
       html += `<div class="slot${full?' slot-full':''}${picked?' picked':''}"
@@ -1011,7 +1222,6 @@ function pickSlot(id, dayId, time, dayLabel, full) {
     return;
   }
 
-  // Highlight
   document.querySelectorAll('.slot').forEach(el => el.classList.remove('picked'));
   event.currentTarget.classList.add('picked');
 
@@ -1031,36 +1241,37 @@ async function submitBooking() {
 
   err.style.display = 'none';
 
-  if (!name)      { showErr(err, t('err.name'));  return; }
-  if (!phone)     { showErr(err, t('err.phone')); return; }
-  if (!S.slot)    { return; }
+  if (!name)   { showErr(err, t('err.name'));  return; }
+  if (!phone)  { showErr(err, t('err.phone')); return; }
+  if (!S.slot) { return; }
 
-  const code    = genCode();
+  const isNotfall = S.slot.id === 'NOTFALL';
+  const code = genCode();
+
   const booking = {
-    action: 'book', code,
-    type:   S.type,
-    dayId:  S.slot.dayId,
-    dayLabel: S.slot.dayLabel,
-    time:   S.slot.time,
+    action:   'book',
+    code,
+    type:     isNotfall ? 'notfall' : S.type,
+    ...(S.physio ? { physio: S.physio } : {}),
+    dayId:    isNotfall ? 'NOTFALL' : S.slot.dayId,
+    dayLabel: isNotfall ? t('notfall.label') : S.slot.dayLabel,
+    time:     isNotfall ? t('notfall.time')  : S.slot.time,
     name, phone,
-    event:  CFG.EVENT,
-    ts:     new Date().toISOString(),
+    event:    CFG.EVENT,
+    ts:       new Date().toISOString(),
   };
 
-  // Local storage backup
   const stored = JSON.parse(localStorage.getItem('w1_bookings') || '[]');
   stored.push(booking);
   localStorage.setItem('w1_bookings', JSON.stringify(stored));
 
-  // Backend (non-blocking)
   postBackend(booking);
 
-  // Show confirmation
   document.getElementById('code-val').textContent = code;
-  document.getElementById('confirm-sum').innerHTML =
-    sumHTML({ type: S.type, dayLabel: S.slot.dayLabel, time: S.slot.time, name, phone });
+  document.getElementById('confirm-sum').innerHTML = isNotfall
+    ? notfallSumHTML({ name, phone })
+    : sumHTML({ type: S.type, dayLabel: S.slot.dayLabel, time: S.slot.time, name, phone });
 
-  // Reset form
   document.getElementById('inp-name').value  = '';
   document.getElementById('inp-phone').value = '';
 
@@ -1076,14 +1287,15 @@ async function submitWaitlist() {
   if (!name || !phone) return;
 
   postBackend({
-    action: 'waitlist',
-    type:   S.type,
-    dayId:  S.slot?.dayId,
+    action:   'waitlist',
+    type:     S.type,
+    ...(S.physio ? { physio: S.physio } : {}),
+    dayId:    S.slot?.dayId,
     dayLabel: S.slot?.dayLabel,
-    time:   S.slot?.time,
+    time:     S.slot?.time,
     name, phone,
-    event:  CFG.EVENT,
-    ts:     new Date().toISOString(),
+    event:    CFG.EVENT,
+    ts:       new Date().toISOString(),
   });
 
   document.getElementById('wl-name').value  = '';
@@ -1104,7 +1316,6 @@ async function cancelBooking() {
 
   if (!code || code.length < 4) { showErr(err, t('err.code')); return; }
 
-  // Check localStorage
   const stored = JSON.parse(localStorage.getItem('w1_bookings') || '[]');
   const idx = stored.findIndex(b => b.code === code);
 
@@ -1118,7 +1329,6 @@ async function cancelBooking() {
     return;
   }
 
-  // Try backend
   if (CFG.BACKEND !== 'APPS_SCRIPT_URL_HIER') {
     try {
       await postBackend({ action: 'cancel', code, event: CFG.EVENT });
@@ -1139,10 +1349,7 @@ async function postBackend(data) {
   if (CFG.BACKEND === 'APPS_SCRIPT_URL_HIER') return;
   try {
     const params = new URLSearchParams(data).toString();
-    await fetch(`${CFG.BACKEND}?${params}`, {
-      method: 'GET',
-      mode: 'no-cors',
-    });
+    await fetch(`${CFG.BACKEND}?${params}`, { method: 'GET', mode: 'no-cors' });
   } catch(e) { console.warn('Backend error:', e); }
 }
 
