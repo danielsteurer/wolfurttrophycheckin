@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#3D675E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>werkeins — Check-in</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<style>
+@import url('https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css');
+@import url('https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  border-radius: 0 !important;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --green:   #3D675E;
+  --mint:    #9AD89E;
+  --white:   #FFFFFF;
+  --grid:    rgba(154,216,158,0.18);
+  --muted:   rgba(255,255,255,0.55);
+  --dim:     rgba(255,255,255,0.15);
+  --sans:    'Geist', system-ui, -apple-system, sans-serif;
+  --mono:    'Geist Mono', ui-monospace, monospace;
+}
+
+html, body {
+  min-height: 100dvh;
+  background: var(--green);
+  color: var(--white);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Dashed grid overlay (Brand Manual) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(90deg, var(--grid) 0, var(--grid) 1px, transparent 1px, transparent 33.333vw),
+    repeating-linear-gradient(0deg, var(--grid) 0, var(--grid) 1px, transparent 1px, transparent 120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ───────────────────────────────────────── */
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.screen { display: none; flex: 1; flex-direction: column; min-height: 100dvh; }
+.screen.active { display: flex; }
+
+.hd {
+  padding: 20px 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--grid);
+  flex-shrink: 0;
+}
+
+.logo { height: 36px; width: auto; display: block; }
+.logo-fallback {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.04em;
+  color: var(--white);
+}
+.logo-fallback span { color: var(--mint); }
+
+.main {
+  flex: 1;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.ft {
+  padding: 14px 24px;
+  border-top: 1px dashed var(--grid);
+  display: flex;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.ft span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  color: rgba(255,255,255,0.3);
+}
+
+/* ── Typography ───────────────────────────────────── */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.h1 {
+  font-weight: 600;
+  font-size: clamp(38px, 10vw, 56px);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+.h1 .eins { color: var(--mint); }
+
+.h2 {
+  font-weight: 600;
+  font-size: clamp(28px, 7vw, 40px);
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--white);
+  margin-bottom: 20px;
+}
+
+.body {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+}
+
+.hr { border: none; border-top: 1px dashed var(--grid); margin: 20px 0; }
+.spacer { flex: 1; min-height: 16px; }
+
+/* ── Language toggle ──────────────────────────────── */
+.lang {
+  display: flex;
+  border: 1px solid var(--dim);
+  overflow: hidden;
+}
+.lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 11px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-btn.on { background: var(--mint); color: var(--green); }
+
+/* ── Back button ──────────────────────────────────── */
+.back {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+.back:hover { color: var(--white); }
+
+/* ── Buttons ──────────────────────────────────────── */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 17px 20px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.12s;
+  text-align: left;
+}
+.btn:active { opacity: 0.8; }
+
+.btn-p { background: var(--mint); color: var(--green); }
+.btn-p::after { content: ' →'; }
+
+.btn-s {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--dim);
+  margin-top: 8px;
+}
+.btn-s:hover { border-color: rgba(255,255,255,0.4); }
+
+.btn-ghost {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 10px 0;
+  width: auto;
+  display: inline-block;
+}
+
+/* ── Type cards ───────────────────────────────────── */
+.type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.type-card {
+  padding: 24px 18px 20px;
+  border: 1px solid var(--dim);
+  cursor: pointer;
+  background: rgba(255,255,255,0.03);
+  transition: all 0.12s;
+  user-select: none;
+}
+.type-card:hover, .type-card:active {
+  border-color: var(--mint);
+  background: rgba(154,216,158,0.07);
+}
+
+.tc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 10px;
+}
+
+.tc-title {
+  font-weight: 600;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--white);
+}
+
+.tc-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ── Slot grid ────────────────────────────────────── */
+.day-sec { margin-bottom: 20px; }
+
+.day-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mint);
+  padding: 10px 0 8px;
+  border-bottom: 1px dashed var(--grid);
+  margin-bottom: 8px;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.slot {
+  padding: 11px 6px;
+  border: 1px solid var(--dim);
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.1s;
+  user-select: none;
+}
+.slot:hover:not(.slot-full) {
+  border-color: var(--mint);
+  background: rgba(154,216,158,0.07);
+}
+.slot.picked {
+  background: var(--mint);
+  border-color: var(--mint);
+}
+.slot.picked .s-time { color: var(--green); }
+.slot.picked .s-avail { color: rgba(61,103,94,0.75); }
+
+.slot-full { opacity: 0.38; }
+.slot-full:hover { border-color: var(--dim); background: rgba(255,255,255,0.03); cursor: pointer; }
+
+.s-time {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+.s-avail {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--mint);
+  margin-top: 3px;
+}
+.slot-full .s-avail { color: rgba(255,255,255,0.35); }
+
+/* ── Form ─────────────────────────────────────────── */
+.field { margin-bottom: 14px; }
+
+.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 7px;
+}
+
+.field-input {
+  width: 100%;
+  padding: 13px 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--dim);
+  color: var(--white);
+  font-family: var(--sans);
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.12s;
+}
+.field-input:focus { border-color: var(--mint); }
+.field-input::placeholder { color: rgba(255,255,255,0.25); }
+
+/* ── Summary card ─────────────────────────────────── */
+.sum-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--dim);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--grid);
+}
+.sum-row:last-child { border-bottom: none; }
+.sum-k {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+.sum-v {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--white);
+}
+
+/* ── Code display ─────────────────────────────────── */
+.code-box {
+  background: var(--mint);
+  padding: 18px 20px;
+  margin: 16px 0;
+}
+.code-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.code-val {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 38px;
+  letter-spacing: 0.1em;
+  color: var(--green);
+  line-height: 1;
+}
+
+/* ── Waitlist badge ───────────────────────────────── */
+.wl-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.08);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 14px;
+}
+
+/* ── Alert ────────────────────────────────────────── */
+.alert {
+  padding: 12px 15px;
+  border: 1px solid var(--dim);
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  display: none;
+}
+.alert-warn { border-color: rgba(255,180,80,0.5); color: rgba(255,210,130,1); background: rgba(255,180,80,0.06); }
+.alert-ok   { border-color: rgba(154,216,158,0.5); color: var(--mint); background: rgba(154,216,158,0.06); }
+
+/* ── Loading ──────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.spin {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(154,216,158,0.25);
+  border-top-color: var(--mint);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Pulse dot ────────────────────────────────────── */
+.dot-live {
+  width: 7px; height: 7px;
+  background: var(--mint);
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── Cancel input ─────────────────────────────────── */
+.cancel-input {
+  font-family: var(--mono) !important;
+  font-size: 22px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- HOME                                            -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen active" id="s-home">
+  <div class="hd">
+    <img class="logo" src="./logo-white.png" alt="werkeins"
+         onerror="this.style.display='none';document.getElementById('logo-fb').style.display='block'">
+    <div class="logo-fallback" id="logo-fb" style="display:none">werk<span>eins</span></div>
+    <div class="lang">
+      <button class="lang-btn on" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="home-eyebrow">Wolfurt Trophy · Sportmedizin</div>
+    <h1 class="h1">MEDIZI<span class="eins">NISCH</span><br>ER<br>CHECK-IN</h1>
+    <p class="body" id="home-sub">Wähle, ob du einen Termin beim Arzt oder bei der Physiotherapie buchen möchtest.</p>
+
+    <div class="type-grid">
+      <div class="type-card" onclick="pickType('arzt')">
+        <div class="tc-label" id="tc-arzt-label">Sportmedizin</div>
+        <div class="tc-title" id="tc-arzt-title">ARZT</div>
+        <div class="tc-sub" id="tc-arzt-sub">Verletzung · Beurteilung · Akutversorgung</div>
+      </div>
+      <div class="type-card" onclick="pickType('physio')">
+        <div class="tc-label" id="tc-physio-label">Physiotherapie</div>
+        <div class="tc-title" id="tc-physio-title">PHYSIO</div>
+        <div class="tc-sub" id="tc-physio-sub">Therapie · Taping · Mobilisation</div>
+      </div>
+    </div>
+
+    <div class="spacer"></div>
+    <hr class="hr">
+    <button class="btn-ghost" onclick="go('s-cancel')" id="home-cancel-btn">Buchung stornieren</button>
+  </div>
+  <div class="ft">
+    <span>werkeins.at</span>
+    <span>Sportmedizin | Physiotherapie</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SLOTS                                           -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-slots">
+  <div class="hd">
+    <button class="back" onclick="go('s-home')">← <span id="back1">Zurück</span></button>
+    <div class="lang">
+      <button class="lang-btn on" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="slots-eyebrow">Arzt</div>
+    <h2 class="h2" id="slots-title">SLOT WÄHLEN</h2>
+    <hr class="hr">
+    <div id="slots-body">
+      <div class="loading"><div class="spin"></div><span id="loading-txt">Laden...</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- FORM                                            -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-form">
+  <div class="hd">
+    <button class="back" onclick="go('s-slots')">← <span id="back2">Zurück</span></button>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="form-eyebrow">Deine Angaben</div>
+    <h2 class="h2" id="form-title">ANMELDEN</h2>
+    <hr class="hr">
+    <div class="sum-card" id="form-sum"></div>
+
+    <div class="field">
+      <label class="field-label" id="lbl-name">Name</label>
+      <input class="field-input" type="text" id="inp-name" placeholder="Vollständiger Name" autocomplete="name">
+    </div>
+    <div class="field">
+      <label class="field-label" id="lbl-phone">Handynummer</label>
+      <input class="field-input" type="tel" id="inp-phone" placeholder="+43 660 123 456" autocomplete="tel">
+    </div>
+
+    <div class="spacer"></div>
+    <div class="alert alert-warn" id="form-err"></div>
+    <button class="btn btn-p" onclick="submitBooking()" id="form-submit">JETZT BUCHEN</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- CONFIRM                                         -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-confirm">
+  <div class="hd">
+    <img class="logo" src="./logo-white.png" alt="werkeins"
+         onerror="this.style.display='none'">
+  </div>
+  <div class="main">
+    <div class="eyebrow"><span class="dot-live"></span><span id="confirm-eyebrow">Buchung bestätigt</span></div>
+    <h2 class="h2" id="confirm-title">ALLES<br>BEREIT.</h2>
+    <hr class="hr">
+    <div class="sum-card" id="confirm-sum"></div>
+    <div class="code-box">
+      <div class="code-label" id="code-label">Dein Buchungscode</div>
+      <div class="code-val" id="code-val">——</div>
+    </div>
+    <p class="body" style="font-size:12px;" id="confirm-hint">
+      Screenshot machen oder Code notieren — du brauchst ihn für eine Stornierung.
+    </p>
+    <div class="spacer"></div>
+    <hr class="hr">
+    <button class="btn btn-s" onclick="go('s-home')" id="confirm-new">NEUE BUCHUNG</button>
+  </div>
+  <div class="ft">
+    <span>werkeins.at</span>
+    <span>Sportmedizin | Physiotherapie</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- WAITLIST                                        -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-waitlist">
+  <div class="hd">
+    <button class="back" onclick="go('s-home')">← <span id="back3">Zurück</span></button>
+  </div>
+  <div class="main">
+    <div class="wl-badge" id="wl-badge">Warteliste</div>
+    <h2 class="h2" id="wl-title">ALLE SLOTS<br>BELEGT.</h2>
+    <hr class="hr">
+    <p class="body" id="wl-text">Komm einfach vorbei — wir finden gemeinsam eine Lösung. Das werkeins-Team ist für dich da.</p>
+
+    <div class="sum-card" id="wl-sum" style="margin-top:20px;"></div>
+
+    <p class="body" style="font-size:12px;margin-top:14px;" id="wl-hint">
+      Warteliste eintragen? Wir melden uns per SMS wenn ein Platz frei wird.
+    </p>
+    <div class="field" style="margin-top:16px;">
+      <label class="field-label" id="wl-lbl-name">Name</label>
+      <input class="field-input" type="text" id="wl-name" placeholder="Dein Name" autocomplete="name">
+    </div>
+    <div class="field">
+      <label class="field-label" id="wl-lbl-phone">Handynummer</label>
+      <input class="field-input" type="tel" id="wl-phone" placeholder="+43 660 123 456" autocomplete="tel">
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-p" onclick="submitWaitlist()" id="wl-submit">AUF WARTELISTE</button>
+    <button class="btn btn-s" onclick="go('s-home')" id="wl-skip">EINFACH VORBEIKOMMEN</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- CANCEL                                          -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-cancel">
+  <div class="hd">
+    <button class="back" onclick="go('s-home')">← <span id="back4">Zurück</span></button>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="cancel-eyebrow">Stornierung</div>
+    <h2 class="h2" id="cancel-title">BUCHUNG<br>STORNIEREN</h2>
+    <hr class="hr">
+    <div class="field">
+      <label class="field-label" id="cancel-code-label">Buchungscode</label>
+      <input class="field-input cancel-input" type="text" id="inp-code"
+             maxlength="6" placeholder="A3X9K2" autocomplete="off"
+             oninput="this.value=this.value.toUpperCase()">
+    </div>
+    <div class="alert alert-warn" id="cancel-err"></div>
+    <div class="alert alert-ok"   id="cancel-ok"></div>
+    <div class="spacer"></div>
+    <button class="btn btn-p" onclick="cancelBooking()" id="cancel-submit">STORNIEREN</button>
+    <button class="btn btn-s" onclick="go('s-home')" id="cancel-back">ZURÜCK</button>
+  </div>
+</div>
+
+</div><!-- /.app -->
+
+<script>
+// ════════════════════════════════════════════════════
+// CONFIG — hier anpassen vor dem Deployment
+// ════════════════════════════════════════════════════
+const CFG = {
+  // Nach Deployment des Google Apps Script diese URL eintragen:
+  BACKEND: 'https://script.google.com/macros/s/AKfycbx6F7juppoBxQVtAQgGAyuryD1vonwNsH-0EHrtyEH4ebXhbBjtm4SwulqUixagGqOe/exec',
+
+  EVENT: 'Wolfurt Trophy',
+
+  // Turniertage — genaue Daten eintragen sobald bekannt
+  DAYS: [
+    { id:'FR', de:'Freitag',   en:'Friday',   start:'12:00', end:'19:00' },
+    { id:'SA', de:'Samstag',   en:'Saturday', start:'10:00', end:'18:00' },
+    { id:'SO', de:'Sonntag',   en:'Sunday',   start:'10:00', end:'15:00' },
+  ],
+
+  SLOT_MIN:    20,  // Minuten pro Slot
+  BREAK_EVERY: 2,   // Pause nach N Slots
+  BREAK_MIN:   10,  // Minuten Pause
+
+  CAP: { arzt: 1, physio: 2 },
+};
+
+// ════════════════════════════════════════════════════
+// TRANSLATIONS
+// ════════════════════════════════════════════════════
+const TX = {
+  de: {
+    'home.eyebrow':    'Wolfurt Trophy · Sportmedizin',
+    'home.sub':        'Wähle, ob du einen Termin beim Arzt oder bei der Physiotherapie buchen möchtest.',
+    'home.cancel':     'Buchung stornieren',
+    'tc.arzt.label':   'Sportmedizin',
+    'tc.arzt.title':   'ARZT',
+    'tc.arzt.sub':     'Verletzung · Beurteilung · Akutversorgung',
+    'tc.physio.label': 'Physiotherapie',
+    'tc.physio.title': 'PHYSIO',
+    'tc.physio.sub':   'Therapie · Taping · Mobilisation',
+    'back':            'Zurück',
+    'slots.title':     'SLOT WÄHLEN',
+    'form.eyebrow':    'Deine Angaben',
+    'form.title':      'ANMELDEN',
+    'lbl.name':        'Name',
+    'lbl.phone':       'Handynummer',
+    'ph.name':         'Vollständiger Name',
+    'ph.phone':        '+43 660 123 456',
+    'form.submit':     'JETZT BUCHEN',
+    'confirm.eyebrow': 'Buchung bestätigt',
+    'confirm.title':   'ALLES\nBEREIT.',
+    'code.label':      'Dein Buchungscode',
+    'confirm.hint':    'Screenshot machen oder Code notieren — du brauchst ihn für eine Stornierung.',
+    'confirm.new':     'NEUE BUCHUNG',
+    'wl.badge':        'Warteliste',
+    'wl.title':        'ALLE SLOTS\nBELEGT.',
+    'wl.text':         'Komm einfach vorbei — wir finden gemeinsam eine Lösung. Das werkeins-Team ist für dich da.',
+    'wl.hint':         'Warteliste eintragen? Wir melden uns per SMS wenn ein Platz frei wird.',
+    'wl.submit':       'AUF WARTELISTE',
+    'wl.skip':         'EINFACH VORBEIKOMMEN',
+    'cancel.eyebrow':  'Stornierung',
+    'cancel.title':    'BUCHUNG\nSTORNIEREN',
+    'cancel.code':     'Buchungscode',
+    'cancel.submit':   'STORNIEREN',
+    'cancel.back':     'ZURÜCK',
+    'cancel.ok':       'Buchung erfolgreich storniert.',
+    'loading':         'Laden...',
+    'slot.full':       'voll',
+    'slot.free1':      'Platz frei',
+    'slot.freeN':      'Plätze frei',
+    'err.name':        'Bitte gib deinen Namen ein.',
+    'err.phone':       'Bitte gib deine Handynummer ein.',
+    'err.code':        'Code nicht gefunden. Bitte Code prüfen.',
+    'lbl.type':        'Art',
+    'lbl.day':         'Tag',
+    'lbl.time':        'Zeit',
+    'type.arzt':       'Arzt',
+    'type.physio':     'Physio',
+  },
+  en: {
+    'home.eyebrow':    'Wolfurt Trophy · Sports Medicine',
+    'home.sub':        'Choose whether you want to book an appointment with the doctor or physiotherapy.',
+    'home.cancel':     'Cancel booking',
+    'tc.arzt.label':   'Sports Medicine',
+    'tc.arzt.title':   'DOCTOR',
+    'tc.arzt.sub':     'Injury · Assessment · Acute care',
+    'tc.physio.label': 'Physiotherapy',
+    'tc.physio.title': 'PHYSIO',
+    'tc.physio.sub':   'Therapy · Taping · Mobilisation',
+    'back':            'Back',
+    'slots.title':     'CHOOSE SLOT',
+    'form.eyebrow':    'Your Details',
+    'form.title':      'REGISTER',
+    'lbl.name':        'Name',
+    'lbl.phone':       'Phone number',
+    'ph.name':         'Full name',
+    'ph.phone':        '+43 660 123 456',
+    'form.submit':     'BOOK NOW',
+    'confirm.eyebrow': 'Booking confirmed',
+    'confirm.title':   'ALL\nSET.',
+    'code.label':      'Your booking code',
+    'confirm.hint':    'Take a screenshot or note this code — you need it to cancel.',
+    'confirm.new':     'NEW BOOKING',
+    'wl.badge':        'Waitlist',
+    'wl.title':        'ALL SLOTS\nTAKEN.',
+    'wl.text':         "Just come by — we'll find a solution. The werkeins team is here for you.",
+    'wl.hint':         'Join the waitlist? We\'ll text you when a spot opens up.',
+    'wl.submit':       'JOIN WAITLIST',
+    'wl.skip':         'JUST COME BY',
+    'cancel.eyebrow':  'Cancellation',
+    'cancel.title':    'CANCEL\nBOOKING',
+    'cancel.code':     'Booking code',
+    'cancel.submit':   'CANCEL BOOKING',
+    'cancel.back':     'BACK',
+    'cancel.ok':       'Booking successfully cancelled.',
+    'loading':         'Loading...',
+    'slot.full':       'full',
+    'slot.free1':      'spot left',
+    'slot.freeN':      'spots left',
+    'err.name':        'Please enter your name.',
+    'err.phone':       'Please enter your phone number.',
+    'err.code':        'Code not found. Please check the code.',
+    'lbl.type':        'Type',
+    'lbl.day':         'Day',
+    'lbl.time':        'Time',
+    'type.arzt':       'Doctor',
+    'type.physio':     'Physio',
+  }
+};
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+const S = {
+  lang:    'de',
+  type:    null,
+  slot:    null,   // { id, time, dayLabel }
+  slots:   null,   // availability map from backend
+};
+
+// ════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════
+const t = k => TX[S.lang][k] ?? TX.de[k] ?? k;
+
+function genCode() {
+  const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:6}, () => c[Math.random()*c.length|0]).join('');
+}
+
+function genSlots(day) {
+  const slots = [];
+  const toMin = s => { const [h,m] = s.split(':').map(Number); return h*60+m; };
+  let cur = toMin(day.start);
+  const end = toMin(day.end);
+  let n = 0;
+  while (cur + CFG.SLOT_MIN <= end) {
+    const hh = String(cur/60|0).padStart(2,'0');
+    const mm = String(cur%60).padStart(2,'0');
+    slots.push({ dayId: day.id, time: `${hh}:${mm}` });
+    cur += CFG.SLOT_MIN;
+    if (++n % CFG.BREAK_EVERY === 0 && cur + CFG.SLOT_MIN <= end) cur += CFG.BREAK_MIN;
+  }
+  return slots;
+}
+
+function sumHTML({ type, dayLabel, time, name, phone }) {
+  const typeLabel = type === 'arzt' ? t('type.arzt') : t('type.physio');
+  const rows = [
+    [t('lbl.type'), typeLabel],
+    [t('lbl.day'),  dayLabel || ''],
+    [t('lbl.time'), time     || ''],
+    ...(name  ? [[t('lbl.name'),  name]]  : []),
+    ...(phone ? [[t('lbl.phone'), phone]] : []),
+  ];
+  return rows.map(([k,v]) =>
+    `<div class="sum-row"><span class="sum-k">${k}</span><span class="sum-v">${v}</span></div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ════════════════════════════════════════════════════
+// LANGUAGE
+// ════════════════════════════════════════════════════
+function setLang(lang) {
+  S.lang = lang;
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('on', b.textContent === lang.toUpperCase())
+  );
+
+  // Update all translatable elements
+  const set = (id, key, prop='textContent') => {
+    const el = document.getElementById(id);
+    if (el) el[prop] = t(key);
+  };
+
+  set('home-eyebrow',   'home.eyebrow');
+  set('home-sub',       'home.sub');
+  set('home-cancel-btn','home.cancel');
+  set('tc-arzt-label',  'tc.arzt.label');
+  set('tc-arzt-title',  'tc.arzt.title');
+  set('tc-arzt-sub',    'tc.arzt.sub');
+  set('tc-physio-label','tc.physio.label');
+  set('tc-physio-title','tc.physio.title');
+  set('tc-physio-sub',  'tc.physio.sub');
+  ['back1','back2','back3','back4'].forEach(id => set(id, 'back'));
+  set('slots-title',    'slots.title');
+  set('form-eyebrow',   'form.eyebrow');
+  set('form-title',     'form.title');
+  set('lbl-name',       'lbl.name');
+  set('lbl-phone',      'lbl.phone');
+  set('form-submit',    'form.submit');
+  set('confirm-eyebrow','confirm.eyebrow');
+  set('code-label',     'code.label');
+  set('confirm-hint',   'confirm.hint');
+  set('confirm-new',    'confirm.new');
+  set('wl-badge',       'wl.badge');
+  set('wl-text',        'wl.text');
+  set('wl-hint',        'wl.hint');
+  set('wl-submit',      'wl.submit');
+  set('wl-skip',        'wl.skip');
+  set('wl-lbl-name',    'lbl.name');
+  set('wl-lbl-phone',   'lbl.phone');
+  set('cancel-eyebrow', 'cancel.eyebrow');
+  set('cancel-title',   'cancel.title');
+  set('cancel-code-label','cancel.code');
+  set('cancel-submit',  'cancel.submit');
+  set('cancel-back',    'cancel.back');
+  set('loading-txt',    'loading');
+
+  const inp = document.getElementById('inp-name');
+  if (inp) inp.placeholder = t('ph.name');
+  const inph = document.getElementById('inp-phone');
+  if (inph) inph.placeholder = t('ph.phone');
+
+  // h2 titles with line breaks
+  const ct = document.getElementById('confirm-title');
+  if (ct) ct.innerHTML = t('confirm.title').replace('\n','<br>');
+  const wt = document.getElementById('wl-title');
+  if (wt) wt.innerHTML = t('wl.title').replace('\n','<br>');
+  const cat = document.getElementById('cancel-title');
+  if (cat) cat.innerHTML = t('cancel.title').replace('\n','<br>');
+
+  // Re-render slots if loaded
+  if (S.slots && S.type) renderSlots();
+}
+
+// ════════════════════════════════════════════════════
+// TYPE SELECTION
+// ════════════════════════════════════════════════════
+function pickType(type) {
+  S.type = type;
+  S.slot = null;
+  document.getElementById('slots-eyebrow').textContent =
+    type === 'arzt' ? t('tc.arzt.title') : t('tc.physio.title');
+  go('s-slots');
+  loadSlots(type);
+}
+
+// ════════════════════════════════════════════════════
+// SLOT LOADING & RENDERING
+// ════════════════════════════════════════════════════
+async function loadSlots(type) {
+  const body = document.getElementById('slots-body');
+  body.innerHTML = `<div class="loading"><div class="spin"></div><span>${t('loading')}</span></div>`;
+
+  try {
+    if (CFG.BACKEND !== 'APPS_SCRIPT_URL_HIER') {
+      const r = await fetch(`${CFG.BACKEND}?action=slots&type=${type}`);
+      const d = await r.json();
+      S.slots = d.slots;
+    } else {
+      // Demo mode: all slots available
+      S.slots = {};
+      CFG.DAYS.forEach(day => {
+        genSlots(day).forEach(sl => {
+          S.slots[`${sl.dayId}-${sl.time}`] = {
+            available: CFG.CAP[type], capacity: CFG.CAP[type]
+          };
+        });
+      });
+    }
+  } catch(e) {
+    // Fallback demo
+    S.slots = {};
+    CFG.DAYS.forEach(day => {
+      genSlots(day).forEach(sl => {
+        S.slots[`${sl.dayId}-${sl.time}`] = {
+          available: CFG.CAP[type], capacity: CFG.CAP[type]
+        };
+      });
+    });
+  }
+
+  renderSlots();
+}
+
+function renderSlots() {
+  const body = document.getElementById('slots-body');
+  let html = '';
+
+  CFG.DAYS.forEach(day => {
+    const dayLabel = S.lang === 'de' ? day.de : day.en;
+    html += `<div class="day-sec"><div class="day-label">${dayLabel}</div><div class="slots-grid">`;
+
+    genSlots(day).forEach(sl => {
+      const key  = `${sl.dayId}-${sl.time}`;
+      const info = S.slots?.[key] ?? { available: CFG.CAP[S.type], capacity: CFG.CAP[S.type] };
+      const avail = info.available;
+      const full  = avail <= 0;
+      const picked = S.slot && S.slot.id === key;
+
+      let availTxt = full ? t('slot.full') :
+        avail === 1 ? `1 ${t('slot.free1')}` : `${avail} ${t('slot.freeN')}`;
+
+      html += `<div class="slot${full?' slot-full':''}${picked?' picked':''}"
+        onclick="pickSlot('${key}','${sl.dayId}','${sl.time}','${dayLabel}',${full})">
+        <span class="s-time">${sl.time}</span>
+        <span class="s-avail">${availTxt}</span>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function pickSlot(id, dayId, time, dayLabel, full) {
+  S.slot = { id, dayId, time, dayLabel };
+
+  if (full) {
+    document.getElementById('wl-sum').innerHTML =
+      sumHTML({ type: S.type, dayLabel, time });
+    go('s-waitlist');
+    return;
+  }
+
+  // Highlight
+  document.querySelectorAll('.slot').forEach(el => el.classList.remove('picked'));
+  event.currentTarget.classList.add('picked');
+
+  document.getElementById('form-sum').innerHTML =
+    sumHTML({ type: S.type, dayLabel, time });
+
+  setTimeout(() => go('s-form'), 120);
+}
+
+// ════════════════════════════════════════════════════
+// BOOKING SUBMISSION
+// ════════════════════════════════════════════════════
+async function submitBooking() {
+  const name  = document.getElementById('inp-name').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
+  const err   = document.getElementById('form-err');
+
+  err.style.display = 'none';
+
+  if (!name)      { showErr(err, t('err.name'));  return; }
+  if (!phone)     { showErr(err, t('err.phone')); return; }
+  if (!S.slot)    { return; }
+
+  const code    = genCode();
+  const booking = {
+    action: 'book', code,
+    type:   S.type,
+    dayId:  S.slot.dayId,
+    dayLabel: S.slot.dayLabel,
+    time:   S.slot.time,
+    name, phone,
+    event:  CFG.EVENT,
+    ts:     new Date().toISOString(),
+  };
+
+  // Local storage backup
+  const stored = JSON.parse(localStorage.getItem('w1_bookings') || '[]');
+  stored.push(booking);
+  localStorage.setItem('w1_bookings', JSON.stringify(stored));
+
+  // Backend (non-blocking)
+  postBackend(booking);
+
+  // Show confirmation
+  document.getElementById('code-val').textContent = code;
+  document.getElementById('confirm-sum').innerHTML =
+    sumHTML({ type: S.type, dayLabel: S.slot.dayLabel, time: S.slot.time, name, phone });
+
+  // Reset form
+  document.getElementById('inp-name').value  = '';
+  document.getElementById('inp-phone').value = '';
+
+  go('s-confirm');
+}
+
+// ════════════════════════════════════════════════════
+// WAITLIST
+// ════════════════════════════════════════════════════
+async function submitWaitlist() {
+  const name  = document.getElementById('wl-name').value.trim();
+  const phone = document.getElementById('wl-phone').value.trim();
+  if (!name || !phone) return;
+
+  postBackend({
+    action: 'waitlist',
+    type:   S.type,
+    dayId:  S.slot?.dayId,
+    dayLabel: S.slot?.dayLabel,
+    time:   S.slot?.time,
+    name, phone,
+    event:  CFG.EVENT,
+    ts:     new Date().toISOString(),
+  });
+
+  document.getElementById('wl-name').value  = '';
+  document.getElementById('wl-phone').value = '';
+  go('s-home');
+}
+
+// ════════════════════════════════════════════════════
+// CANCELLATION
+// ════════════════════════════════════════════════════
+async function cancelBooking() {
+  const code = document.getElementById('inp-code').value.trim().toUpperCase();
+  const err  = document.getElementById('cancel-err');
+  const ok   = document.getElementById('cancel-ok');
+
+  err.style.display = 'none';
+  ok.style.display  = 'none';
+
+  if (!code || code.length < 4) { showErr(err, t('err.code')); return; }
+
+  // Check localStorage
+  const stored = JSON.parse(localStorage.getItem('w1_bookings') || '[]');
+  const idx = stored.findIndex(b => b.code === code);
+
+  if (idx !== -1) {
+    stored.splice(idx, 1);
+    localStorage.setItem('w1_bookings', JSON.stringify(stored));
+    postBackend({ action: 'cancel', code, event: CFG.EVENT });
+    document.getElementById('inp-code').value = '';
+    ok.textContent = t('cancel.ok');
+    ok.style.display = 'block';
+    return;
+  }
+
+  // Try backend
+  if (CFG.BACKEND !== 'APPS_SCRIPT_URL_HIER') {
+    try {
+      await postBackend({ action: 'cancel', code, event: CFG.EVENT });
+      document.getElementById('inp-code').value = '';
+      ok.textContent = t('cancel.ok');
+      ok.style.display = 'block';
+      return;
+    } catch(e) {}
+  }
+
+  showErr(err, t('err.code'));
+}
+
+// ════════════════════════════════════════════════════
+// BACKEND HELPERS
+// ════════════════════════════════════════════════════
+async function postBackend(data) {
+  if (CFG.BACKEND === 'APPS_SCRIPT_URL_HIER') return;
+  try {
+    await fetch(CFG.BACKEND, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+  } catch(e) { console.warn('Backend error:', e); }
+}
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+setLang('de');
+</script>
+</body>
+</html>
