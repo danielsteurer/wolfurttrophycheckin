@@ -101,14 +101,11 @@ body::before {
   gap: 20px;
 }
 
-/* mix-blend-mode: multiply hides white background.
-   Replace logo-dark.png with a transparent PNG for perfect results. */
 .logo-wk {
   height: 100px;
   width: auto;
   display: block;
   flex-shrink: 0;
-  mix-blend-mode: multiply;
 }
 
 .logo-div {
@@ -131,7 +128,6 @@ body::before {
   width: auto;
   display: block;
   flex-shrink: 0;
-  mix-blend-mode: multiply;
 }
 .logo-div-sm {
   width: 1px;
@@ -667,7 +663,7 @@ body::before {
 <div class="screen active" id="s-home">
   <div class="hd hd-brand">
     <div class="hd-logos">
-      <img class="logo-wk" src="./logo-dark.png" alt="werkeins"
+      <img class="logo-wk" src="./logo-werkeins.svg" alt="werkeins"
            onerror="this.style.display='none';document.getElementById('logo-fb').style.display='block'">
       <div class="logo-fallback" id="logo-fb" style="display:none">werk<span>eins</span></div>
       <div class="logo-div"></div>
@@ -817,7 +813,7 @@ body::before {
 <div class="screen" id="s-confirm">
   <div class="hd hd-brand">
     <div class="hd-logos">
-      <img class="logo-wk" src="./logo-dark.png" alt="werkeins"
+      <img class="logo-wk" src="./logo-werkeins.svg" alt="werkeins"
            onerror="this.style.display='none'">
       <div class="logo-div"></div>
       <img class="logo-wt" src="./WTLogo.png" alt="Wolfurt Trophy"
