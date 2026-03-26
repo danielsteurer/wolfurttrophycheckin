@@ -1371,8 +1371,36 @@ function pickNotfall() {
 // ════════════════════════════════════════════════════
 // SLOT LOADING & RENDERING
 // ════════════════════════════════════════════════════
+const SLOT_CACHE_TTL = 90000; // 90 Sekunden
+const S_CACHE = {};
+
+async function preloadSlots() {
+  if (CFG.BACKEND === 'APPS_SCRIPT_URL_HIER') return;
+  for (const type of ['arzt', 'physio']) {
+    try {
+      const r = await fetch(`${CFG.BACKEND}?action=slots&type=${type}`);
+      const d = await r.json();
+      S_CACHE[type] = { slots: d.slots, ts: Date.now() };
+    } catch(e) {}
+  }
+}
+
 async function loadSlots(type) {
   const body = document.getElementById('slots-body');
+
+  // Cache vorhanden und frisch → sofort anzeigen
+  const cached = S_CACHE[type];
+  if (cached && Date.now() - cached.ts < SLOT_CACHE_TTL) {
+    S.slots = cached.slots;
+    renderSlots();
+    // Im Hintergrund neu laden
+    fetch(`${CFG.BACKEND}?action=slots&type=${type}`)
+      .then(r => r.json())
+      .then(d => { S_CACHE[type] = { slots: d.slots, ts: Date.now() }; })
+      .catch(() => {});
+    return;
+  }
+
   body.innerHTML = `<div class="loading"><div class="spin"></div><span>${t('loading')}</span></div>`;
 
   try {
@@ -1380,6 +1408,7 @@ async function loadSlots(type) {
       const r = await fetch(`${CFG.BACKEND}?action=slots&type=${type}`);
       const d = await r.json();
       S.slots = d.slots;
+      S_CACHE[type] = { slots: d.slots, ts: Date.now() };
     } else {
       S.slots = {};
       CFG.DAYS.forEach(day => {
@@ -1493,10 +1522,11 @@ async function submitBooking() {
   document.getElementById('inp-name').value  = '';
   document.getElementById('inp-phone').value = '';
 
-  // Optimistic slot update — sofort sichtbar ohne Backend-Reload
+  // Optimistic slot update + Cache invalidieren
   if (!isNotfall && S.slots?.[S.slot.id] != null) {
     S.slots[S.slot.id].available = Math.max(0, (S.slots[S.slot.id].available ?? 1) - 1);
   }
+  delete S_CACHE[S.type]; // Cache für diesen Typ löschen damit nächstes Laden frisch ist
 
   go('s-confirm');
 }
@@ -1677,6 +1707,7 @@ function switchAdminDay(day) {
 // INIT
 // ════════════════════════════════════════════════════
 setLang('de');
+preloadSlots();
 if (window.location.search.includes('admin')) go('s-admin-pin');
 </script>
 </body>
