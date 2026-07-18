@@ -653,6 +653,12 @@ body::before {
   text-transform: uppercase;
 }
 
+/* ── Textarea ────────────────────────────────────── */
+textarea.field-input {
+  resize: vertical;
+  min-height: 86px;
+}
+
 /* ── Admin ────────────────────────────────────────── */
 .admin-tabs {
   display: flex;
@@ -760,7 +766,7 @@ body::before {
   <div class="main">
     <div class="eyebrow" id="home-eyebrow">Wolfurt Trophy · 7.–9. August 2026</div>
     <h1 class="h1">BEACH<br><span class="eins">MEDICAL</span><br>CENTER.</h1>
-    <p class="body" id="home-sub">Termin beim Arzt oder Physio buchen — oder die Recovery Zone entdecken.</p>
+    <p class="body" id="home-sub">Physio-Termin buchen oder Arzt-Anfrage stellen — oder die Recovery Zone entdecken.</p>
 
     <div class="type-grid">
       <div class="type-card" onclick="pickType('arzt')">
@@ -837,6 +843,67 @@ body::before {
 
     <div class="spacer"></div>
     <button class="btn btn-s" onclick="go('s-home')" id="rec-back-btn">ZURÜCK ZUR ÜBERSICHT</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- ARZT REQUEST                                    -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-arzt-request">
+  <div class="hd">
+    <button class="back" onclick="go('s-home')">← <span id="arzt-req-back">Zurück</span></button>
+    <div class="lang">
+      <button class="lang-btn on" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="eyebrow" id="arzt-req-eyebrow">Sportmedizin · Anfrage</div>
+    <h2 class="h2" id="arzt-req-title">ARZT<br>ANFRAGEN</h2>
+    <hr class="hr">
+    <div class="field">
+      <label class="field-label" id="arzt-lbl-name">Name</label>
+      <input class="field-input" type="text" id="arzt-name" placeholder="Vollständiger Name" autocomplete="name">
+    </div>
+    <div class="field">
+      <label class="field-label" id="arzt-lbl-phone">Handynummer</label>
+      <input class="field-input" type="tel" id="arzt-phone" placeholder="+43 660 123 456" autocomplete="tel">
+    </div>
+    <div class="field">
+      <label class="field-label" id="arzt-anliegen-label">Kurze Beschreibung</label>
+      <textarea class="field-input" id="arzt-anliegen" rows="3" placeholder="Was beschäftigt dich?"></textarea>
+    </div>
+    <div class="spacer"></div>
+    <div class="alert alert-warn" id="arzt-err"></div>
+    <button class="btn btn-p" onclick="submitArztRequest()" id="arzt-req-submit">ANFRAGE SENDEN</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- ARZT CONFIRM                                    -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="screen" id="s-arzt-confirm">
+  <div class="hd hd-brand">
+    <div class="hd-logos">
+      <img class="logo-wk" src="./logo-werkeins.svg" alt="werkeins"
+           onerror="this.style.display='none'">
+      <div class="logo-div"></div>
+      <img class="logo-wt" src="./WTLogo.png" alt="Wolfurt Trophy"
+           onerror="this.style.display='none'">
+    </div>
+  </div>
+  <div class="main">
+    <div class="eyebrow"><span class="dot-live"></span><span id="arzt-confirm-eyebrow">Anfrage gesendet</span></div>
+    <h2 class="h2" id="arzt-confirm-title">ANFRAGE<br>ERHALTEN.</h2>
+    <hr class="hr">
+    <p class="body" id="arzt-confirm-body">Wir melden uns so schnell wie möglich per Anruf oder SMS bei dir.</p>
+    <div class="spacer"></div>
+    <hr class="hr">
+    <button class="btn btn-s" onclick="go('s-home')" id="arzt-confirm-back">ZURÜCK ZUR ÜBERSICHT</button>
+  </div>
+  <div class="ft">
+    <span>werkeins.at</span>
+    <span>7.–9. August 2026</span>
   </div>
 </div>
 
@@ -1029,16 +1096,12 @@ const CFG = {
 
   DAYS: [
     {
-      id: 'FR', de: 'FR · 7. August', en: 'FRI · 7 August',
-      sessions: [{ start: '13:00', end: '18:00' }],
-    },
-    {
       id: 'SA', de: 'SA · 8. August', en: 'SAT · 8 August',
-      sessions: [{ start: '09:00', end: '12:00' }, { start: '13:00', end: '18:00' }],
+      sessions: [{ start: '10:00', end: '12:00' }, { start: '13:30', end: '16:30' }],
     },
     {
       id: 'SO', de: 'SO · 9. August', en: 'SUN · 9 August',
-      sessions: [{ start: '09:00', end: '11:00' }, { start: '13:00', end: '15:00' }],
+      sessions: [{ start: '10:00', end: '15:30' }],
     },
   ],
 
@@ -1055,7 +1118,16 @@ const CFG = {
 const TX = {
   de: {
     'home.eyebrow':      'Wolfurt Trophy · 7.–9. August 2026',
-    'home.sub':          'Termin beim Arzt oder Physio buchen — oder die Recovery Zone entdecken.',
+    'home.sub':          'Physio-Termin buchen oder Arzt-Anfrage stellen — oder die Recovery Zone entdecken.',
+    'arzt.req.eyebrow':  'Sportmedizin · Anfrage',
+    'arzt.req.title':    'ARZT\nANFRAGEN',
+    'arzt.anliegen.label': 'Kurze Beschreibung',
+    'arzt.anliegen.ph':  'Was beschäftigt dich?',
+    'arzt.req.submit':   'ANFRAGE SENDEN',
+    'arzt.confirm.eyebrow': 'Anfrage gesendet',
+    'arzt.confirm.title': 'ANFRAGE\nERHALTEN.',
+    'arzt.confirm.body': 'Wir melden uns so schnell wie möglich per Anruf oder SMS bei dir.',
+    'arzt.confirm.back': 'ZURÜCK ZUR ÜBERSICHT',
     'home.cancel':       'Buchung stornieren',
     'tc.arzt.label':     'Sportmedizin',
     'tc.arzt.title':     'ARZT',
@@ -1124,7 +1196,16 @@ const TX = {
   },
   en: {
     'home.eyebrow':      'Wolfurt Trophy · 7–9 August 2026',
-    'home.sub':          'Book an appointment with the doctor or physio — or explore the Recovery Zone.',
+    'home.sub':          'Book a physio appointment or request a doctor visit — or explore the Recovery Zone.',
+    'arzt.req.eyebrow':  'Sports Medicine · Request',
+    'arzt.req.title':    'DOCTOR\nREQUEST',
+    'arzt.anliegen.label': 'Short description',
+    'arzt.anliegen.ph':  "What's your concern?",
+    'arzt.req.submit':   'SEND REQUEST',
+    'arzt.confirm.eyebrow': 'Request sent',
+    'arzt.confirm.title': 'REQUEST\nRECEIVED.',
+    'arzt.confirm.body': "We'll get back to you as soon as possible by call or SMS.",
+    'arzt.confirm.back': 'BACK TO OVERVIEW',
     'home.cancel':       'Cancel booking',
     'tc.arzt.label':     'Sports Medicine',
     'tc.arzt.title':     'DOCTOR',
@@ -1307,7 +1388,7 @@ function setLang(lang) {
   set('rec-shower-desc', 'rec.shower.desc');
   set('rec-boots-name',  'rec.boots.name');
   set('rec-boots-desc',  'rec.boots.desc');
-  ['back1','back2','back3','back4','back-rec'].forEach(id => set(id, 'back'));
+  ['back1','back2','back3','back4','back-rec','arzt-req-back'].forEach(id => set(id, 'back'));
   set('slots-title',     'slots.title');
   set('form-eyebrow',    'form.eyebrow');
   set('form-title',      'form.title');
@@ -1343,6 +1424,26 @@ function setLang(lang) {
   const cat = document.getElementById('cancel-title');
   if (cat) cat.innerHTML = t('cancel.title').replace('\n','<br>');
 
+  set('arzt-req-eyebrow',     'arzt.req.eyebrow');
+  set('arzt-lbl-name',        'lbl.name');
+  set('arzt-lbl-phone',       'lbl.phone');
+  set('arzt-anliegen-label',  'arzt.anliegen.label');
+  set('arzt-req-submit',      'arzt.req.submit');
+  set('arzt-confirm-eyebrow', 'arzt.confirm.eyebrow');
+  set('arzt-confirm-body',    'arzt.confirm.body');
+  set('arzt-confirm-back',    'arzt.confirm.back');
+
+  const arztReqTitle = document.getElementById('arzt-req-title');
+  if (arztReqTitle) arztReqTitle.innerHTML = t('arzt.req.title').replace('\n','<br>');
+  const arztConfTitle = document.getElementById('arzt-confirm-title');
+  if (arztConfTitle) arztConfTitle.innerHTML = t('arzt.confirm.title').replace('\n','<br>');
+  const arztAnl = document.getElementById('arzt-anliegen');
+  if (arztAnl) arztAnl.placeholder = t('arzt.anliegen.ph');
+  const arztNm = document.getElementById('arzt-name');
+  if (arztNm) arztNm.placeholder = t('ph.name');
+  const arztPh = document.getElementById('arzt-phone');
+  if (arztPh) arztPh.placeholder = t('ph.phone');
+
   if (S.slots && S.type) renderSlots();
 }
 
@@ -1353,8 +1454,12 @@ function pickType(type) {
   S.type = type;
   S.slot = null;
 
-  const eyebrow = type === 'arzt' ? t('tc.arzt.title') : t('tc.physio.title');
-  document.getElementById('slots-eyebrow').textContent = eyebrow;
+  if (type === 'arzt') {
+    go('s-arzt-request');
+    return;
+  }
+
+  document.getElementById('slots-eyebrow').textContent = t('tc.physio.title');
   go('s-slots');
   loadSlots(type);
 }
@@ -1432,13 +1537,6 @@ async function loadSlots(type) {
 function renderSlots() {
   const body = document.getElementById('slots-body');
   let html = '';
-
-  if (S.type === 'arzt') {
-    html += `<div class="notfall-wrap">
-      <button class="btn btn-notfall" onclick="pickNotfall()">${t('notfall.btn')}</button>
-      <p class="notfall-hint">${t('notfall.hint')}</p>
-    </div>`;
-  }
 
   CFG.DAYS.forEach(day => {
     const dayLabel = S.lang === 'de' ? day.de : day.en;
@@ -1598,6 +1696,32 @@ async function postBackend(data) {
   } catch(e) { console.warn('Backend error:', e); }
 }
 
+// ════════════════════════════════════════════════════
+// ARZT REQUEST
+// ════════════════════════════════════════════════════
+async function submitArztRequest() {
+  const name     = document.getElementById('arzt-name').value.trim();
+  const phone    = document.getElementById('arzt-phone').value.trim();
+  const anliegen = document.getElementById('arzt-anliegen').value.trim();
+  const err      = document.getElementById('arzt-err');
+
+  err.style.display = 'none';
+  if (!name)  { showErr(err, t('err.name'));  return; }
+  if (!phone) { showErr(err, t('err.phone')); return; }
+
+  postBackend({
+    action: 'arzt_request', type: 'arzt',
+    name, phone, anliegen,
+    event: CFG.EVENT, ts: new Date().toISOString(),
+  });
+
+  document.getElementById('arzt-name').value     = '';
+  document.getElementById('arzt-phone').value    = '';
+  document.getElementById('arzt-anliegen').value = '';
+
+  go('s-arzt-confirm');
+}
+
 function showErr(el, msg) {
   el.textContent = msg;
   el.style.display = 'block';
@@ -1606,7 +1730,7 @@ function showErr(el, msg) {
 // ════════════════════════════════════════════════════
 // ADMIN
 // ════════════════════════════════════════════════════
-const A = { pin: '', bookings: [], day: 'FR' };
+const A = { pin: '', bookings: [], day: 'SA' };
 
 async function checkAdminPin() {
   const pin = document.getElementById('admin-pin-input').value.trim();
@@ -1650,33 +1774,33 @@ function fmtTime(t) {
 }
 
 function renderAdmin() {
-  const total    = A.bookings.length;
-  const arztN    = A.bookings.filter(b => b.type === 'arzt').length;
-  const physioN  = A.bookings.filter(b => b.type === 'physio').length;
-  const notfallN = A.bookings.filter(b => b.type === 'notfall').length;
+  const total   = A.bookings.length;
+  const arztN   = A.bookings.filter(b => b.type === 'arzt').length;
+  const physioN = A.bookings.filter(b => b.type === 'physio').length;
 
   document.getElementById('admin-stats').innerHTML =
     `<div class="admin-stat"><span class="admin-stat-n">${total}</span>Gesamt</div>` +
-    `<div class="admin-stat"><span class="admin-stat-n">${arztN}</span>Arzt</div>` +
-    `<div class="admin-stat"><span class="admin-stat-n">${physioN}</span>Physio</div>` +
-    (notfallN ? `<div class="admin-stat"><span class="admin-stat-n" style="color:var(--warn)">${notfallN}</span>Notfall</div>` : '');
+    `<div class="admin-stat"><span class="admin-stat-n">${arztN}</span>Anfragen</div>` +
+    `<div class="admin-stat"><span class="admin-stat-n">${physioN}</span>Physio</div>`;
 
-  const tabs = CFG.DAYS.map(d => ({ id: d.id, label: d.id }));
-  if (notfallN) tabs.push({ id: 'NOTFALL', label: '⚡' });
+  const tabs = [
+    ...CFG.DAYS.map(d => ({ id: d.id, label: d.id })),
+    { id: 'ANFRAGEN', label: 'ANFRAGEN' },
+  ];
 
   document.getElementById('admin-tabs').innerHTML = tabs.map(tab => {
-    const count = tab.id === 'NOTFALL'
-      ? A.bookings.filter(b => b.type === 'notfall').length
-      : A.bookings.filter(b => b.dayId === tab.id && b.type !== 'notfall').length;
+    const count = tab.id === 'ANFRAGEN'
+      ? A.bookings.filter(b => b.type === 'arzt').length
+      : A.bookings.filter(b => b.dayId === tab.id).length;
     return `<div class="admin-tab${A.day===tab.id?' active':''}" onclick="switchAdminDay('${tab.id}')">
       ${tab.label}<span class="admin-tab-count">${count}</span>
     </div>`;
   }).join('');
 
   const body = document.getElementById('admin-body');
-  const entries = (A.day === 'NOTFALL'
-    ? A.bookings.filter(b => b.type === 'notfall')
-    : A.bookings.filter(b => b.dayId === A.day && b.type !== 'notfall')
+  const entries = (A.day === 'ANFRAGEN'
+    ? A.bookings.filter(b => b.type === 'arzt')
+    : A.bookings.filter(b => b.dayId === A.day)
   ).sort((a, b) => fmtTime(a.time).localeCompare(fmtTime(b.time)));
 
   if (!entries.length) {
@@ -1685,13 +1809,14 @@ function renderAdmin() {
   }
 
   body.innerHTML = entries.map(b => {
-    const cls   = b.type === 'notfall' ? 'notfall' : b.type === 'arzt' ? 'arzt' : 'physio';
-    const badge = b.type === 'notfall' ? 'NOTFALL' : b.type === 'arzt' ? 'ARZT' : 'PHYSIO';
+    const cls   = b.type === 'arzt' ? 'arzt' : 'physio';
+    const badge = b.type === 'arzt' ? 'ARZT' : 'PHYSIO';
+    const timeDisplay = b.time ? fmtTime(b.time) : '↗';
     return `<div class="admin-entry">
-      <div class="admin-time">${b.type === 'notfall' ? '⚡' : fmtTime(b.time)}</div>
+      <div class="admin-time">${timeDisplay}</div>
       <div class="admin-info">
         <div class="admin-name">${b.name || '—'}</div>
-        <div class="admin-phone">${b.phone || ''}</div>
+        <div class="admin-phone">${b.phone || ''}${b.anliegen ? ' — ' + b.anliegen : ''}</div>
       </div>
       <div class="admin-badge ${cls}">${badge}</div>
     </div>`;
